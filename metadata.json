@@ -1,0 +1,8 @@
+{
+  "name": "ETHEREON - Cyber-Defense Control Center",
+  "description": "A premium cybersecurity dashboard for endpoint monitoring, threat detection, and automated incident response featuring real-time analytics and AI-driven threat intelligence.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
