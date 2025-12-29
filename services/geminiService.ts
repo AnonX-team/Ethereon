@@ -1,50 +1,59 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
+/**
+ * Expert Cyber-Defense Analysis
+ * Generates a focused risk assessment for a specific threat.
+ */
 export const analyzeThreat = async (threatType: string, severity: string, endpoint: string) => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: `You are an expert cybersecurity analyst at Ethereon. Analyze the following threat:
-      Type: ${threatType}
-      Severity: ${severity}
-      Affected Endpoint: ${endpoint}
+      model: 'gemini-3-pro-preview', // Use Pro for deep reasoning on threats
+      contents: `You are ETHEREON CORE AI. Perform an emergency forensic analysis on the following security event:
+      EVENT_TYPE: ${threatType}
+      SEVERITY: ${severity}
+      TARGET_NODE: ${endpoint}
       
-      Provide a concise 3-sentence risk summary and a recommended next step.`,
+      Respond with:
+      1. RISK_LEVEL (0-100)
+      2. 3-sentence technical summary.
+      3. IMMEDIATE_ACTION command.`,
       config: {
-        temperature: 0.7,
-        topP: 0.9,
+        temperature: 0.4, // Lower temperature for more analytical/precise output
+        topP: 0.8,
       }
     });
     return response.text;
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return "Error generating AI analysis. Please manually investigate the logs.";
+    console.error("ETHEREON AI ERROR:", error);
+    return "ANALYSIS_FAILURE: Neural links compromised. Proceed with manual mitigation protocol.";
   }
 };
 
+/**
+ * System Health Executive Summary
+ * Synthesizes logs and active threats into a concise status report.
+ */
 export const getSystemHealthSummary = async (logs: any[], threats: any[]) => {
   try {
-    const logSummary = logs.map(l => `${l.date}: ${l.type} - ${l.action}`).join('\n');
-    const threatSummary = threats.map(t => `${t.type} (${t.severity}) on ${t.endpoint}`).join('\n');
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    const logSummary = logs.slice(0, 5).map(l => `[${l.date}] ${l.type}: ${l.action}`).join(' | ');
+    const threatSummary = threats.map(t => `${t.type} severity ${t.severity} on ${t.endpoint}`).join(', ');
 
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `As the Ethereon AI Assistant, summarize the current system health based on these logs and active threats. Keep it brief and professional.
+      contents: `As ETHEREON DEFENSE COMMAND, provide a high-level situation report. 
+      CURRENT_ALERTS: ${threatSummary}
+      RECENT_LOG_STREAM: ${logSummary}
       
-      LOGS:
-      ${logSummary}
-      
-      THREATS:
-      ${threatSummary}`,
+      Maintain a professional, mission-critical tone. Focus on system integrity.`,
       config: {
-        temperature: 0.5,
+        temperature: 0.6,
       }
     });
     return response.text;
   } catch (error) {
-    return "System status report unavailable. Connectivity to AI engine compromised.";
+    return "STATUS_OFFLINE: Connectivity to AI engine compromised. Local backup systems active.";
   }
 };
