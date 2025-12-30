@@ -5,13 +5,14 @@ import { LayoutDashboard, Shield, Zap, FileText, Monitor, LogOut, Cpu } from 'lu
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  onLogout: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'endpoint', label: 'Endpoint Monitoring', icon: Monitor },
-    { id: 'threats', label: 'Threat Detection', icon: Shield },
+    { id: 'threats', label: 'Threat Intelligence', icon: Shield },
     { id: 'response', label: 'Automated Response', icon: Zap },
     { id: 'logs', label: 'Logs & Reports', icon: FileText },
   ];
@@ -53,7 +54,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
       </nav>
 
       <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-500 transition-colors">
+        <button 
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-500 transition-colors"
+        >
           <LogOut size={20} />
           <span className="font-medium text-sm">Logout</span>
         </button>

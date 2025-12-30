@@ -9,7 +9,7 @@ export const analyzeThreat = async (threatType: string, severity: string, endpoi
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview', // Use Pro for deep reasoning on threats
+      model: 'gemini-3-pro-preview',
       contents: `You are ETHEREON CORE AI. Perform an emergency forensic analysis on the following security event:
       EVENT_TYPE: ${threatType}
       SEVERITY: ${severity}
@@ -20,8 +20,9 @@ export const analyzeThreat = async (threatType: string, severity: string, endpoi
       2. 3-sentence technical summary.
       3. IMMEDIATE_ACTION command.`,
       config: {
-        temperature: 0.4, // Lower temperature for more analytical/precise output
+        temperature: 0.4,
         topP: 0.8,
+        thinkingConfig: { thinkingBudget: 4000 } // Added reasoning for deep analysis
       }
     });
     return response.text;
@@ -32,8 +33,25 @@ export const analyzeThreat = async (threatType: string, severity: string, endpoi
 };
 
 /**
+ * Conversational Investigation
+ * Allows the operator to chat with the AI about a threat.
+ */
+export const createInvestigatorChat = (threatContext: string) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  return ai.chats.create({
+    model: 'gemini-3-flash-preview',
+    config: {
+      systemInstruction: `You are ETHEREON INVESTIGATOR, a specialized cyber-forensics AI. 
+      You are investigating: ${threatContext}. 
+      Be brief, technical, and alert the operator to specific patterns or vulnerabilities. 
+      Format your responses in a clear, terminal-like style.`,
+      temperature: 0.7,
+    }
+  });
+};
+
+/**
  * System Health Executive Summary
- * Synthesizes logs and active threats into a concise status report.
  */
 export const getSystemHealthSummary = async (logs: any[], threats: any[]) => {
   try {
