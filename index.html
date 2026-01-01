@@ -4,44 +4,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETHEREON | Cyber-Defense Control Center</title>
+    <title>ETHEREON | Cyber Defense Command</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --nytron-blue: #00f2ff;
+            --nytron-cobalt: #0a84ff;
+            --nytron-bg: #05070a;
+            --nytron-surface: #0a0e14;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease;
+            background-color: var(--nytron-bg);
+            color: #ffffff;
             margin: 0;
-            padding: 0;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .cyber-grid {
-            background-size: 40px 40px;
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Hexagonal Grid Overlay */
+        .nytron-grid {
+            position: fixed;
+            inset: 0;
             background-image: 
-                linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+                radial-gradient(circle at 2px 2px, rgba(0, 242, 255, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 0;
         }
-        .dark .cyber-grid {
-            background-image: 
-                linear-gradient(to right, rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+
+        .hex-pattern {
+          background-color: var(--nytron-bg);
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%2300f2ff' fill-opacity='0.03' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.91v12.68l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.91zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.31zM27.98 15L15 7.5V0h2v6.35l11 6.34V15zm0 18.5L15 41v8h2v-6.85l11-6.34v-2.31z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+
+        .nytron-glass {
+            background: rgba(10, 14, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
-        ::-webkit-scrollbar-track {
-            background: transparent;
+
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
+
+        .neon-text {
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-        }
+
         @keyframes scanline {
             0% { transform: translateY(-100%); }
             100% { transform: translateY(100%); }
@@ -49,32 +63,24 @@
         .scanline::after {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, transparent 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%);
-            animation: scanline 8s linear infinite;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 242, 255, 0.02) 50%, transparent 100%);
+            animation: scanline 10s linear infinite;
             pointer-events: none;
         }
     </style>
     <script>
-        // Polyfill process for browser environments to prevent crashes
         window.process = window.process || { env: {} };
-        
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        ethereon: {
-                            primary: '#3b82f6',
-                            secondary: '#6366f1',
-                            danger: '#ef4444',
-                            warning: '#f59e0b',
-                            success: '#10b981',
-                            dark: '#0f172a',
-                            light: '#f8fafc'
+                        nytron: {
+                            blue: '#00f2ff',
+                            cobalt: '#0a84ff',
+                            bg: '#05070a',
+                            surface: '#0a0e14',
+                            accent: '#7000ff'
                         }
                     }
                 }
@@ -95,8 +101,9 @@
 }
 </script>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 h-screen overflow-hidden cyber-grid relative scanline">
-    <div id="root" class="relative z-10 h-full"></div>
+<body class="hex-pattern scanline">
+    <div class="nytron-grid"></div>
+    <div id="root" class="h-full relative z-10"></div>
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>

@@ -8,22 +8,17 @@ import ThreatDetection from './components/ThreatDetection';
 import AutomatedResponse from './components/AutomatedResponse';
 import LogsReports from './components/LogsReports';
 import Login from './components/Login';
+import KnowledgeBase from './components/KnowledgeBase';
+import AdminPortal from './components/AdminPortal';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [systemStatus, setSystemStatus] = useState('NORMAL');
-  const [connectedCount, setConnectedCount] = useState(5);
-  const [alertCount, setAlertCount] = useState(2);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+  const [knowledgeBase, setKnowledgeBase] = useState<string[]>([
+    "PC-01 is identified as executive-tier hardware.",
+    "Data sync anomalies on SRV-01 are expected during 02:00 UTC windows.",
+    "Authorized VPN access originates from verified London gateway nodes."
+  ]);
 
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;
@@ -31,36 +26,32 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard setActiveTab={setActiveTab} />;
-      case 'endpoint':
-        return <EndpointMonitoring />;
-      case 'threats':
-        return <ThreatDetection />;
-      case 'response':
-        return <AutomatedResponse />;
-      case 'logs':
-        return <LogsReports />;
-      default:
-        return <Dashboard setActiveTab={setActiveTab} />;
+      case 'dashboard': return <Dashboard setActiveTab={setActiveTab} />;
+      case 'endpoint': return <EndpointMonitoring />;
+      case 'threats': return <ThreatDetection knowledgeBase={knowledgeBase} />;
+      case 'response': return <AutomatedResponse />;
+      case 'logs': return <LogsReports />;
+      case 'training': return <KnowledgeBase data={knowledgeBase} onUpdate={setKnowledgeBase} />;
+      case 'admin': return <AdminPortal />;
+      default: return <Dashboard setActiveTab={setActiveTab} />;
     }
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="flex h-screen bg-nytron-bg text-slate-100 font-sans">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={() => setIsAuthenticated(false)} />
       
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden relative">
         <Header 
-          isDarkMode={isDarkMode} 
-          setIsDarkMode={setIsDarkMode}
-          systemStatus={systemStatus}
-          connectedCount={connectedCount}
-          alertCount={alertCount}
+          systemStatus="SECURE"
+          connectedCount={5}
+          alertCount={2}
         />
         
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          {renderContent()}
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-gradient-to-br from-nytron-bg to-nytron-surface/20">
+          <div className="max-w-7xl mx-auto h-full">
+            {renderContent()}
+          </div>
         </div>
       </main>
     </div>

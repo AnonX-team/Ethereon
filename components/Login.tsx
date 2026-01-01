@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Cpu, ShieldCheck, Lock, User, ArrowRight } from 'lucide-react';
+import { Hexagon, Lock, User, ShieldCheck, ArrowRight } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
@@ -18,45 +18,44 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-slate-950">
+    <div className="min-h-screen bg-nytron-bg flex items-center justify-center p-6 relative overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
+      <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-nytron-blue/10 blur-[150px] rounded-full"></div>
+      <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] bg-nytron-accent/10 blur-[150px] rounded-full"></div>
       
-      <div className="w-full max-w-md z-10 animate-in fade-in zoom-in-95 duration-700">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center shadow-2xl shadow-blue-600/40 mb-4 group hover:scale-110 transition-transform">
-            <Cpu className="text-white" size={32} />
+      <div className="w-full max-w-sm z-10 animate-in fade-in zoom-in-95 duration-1000">
+        <div className="text-center mb-12">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <Hexagon className="text-nytron-blue fill-nytron-blue/5 animate-pulse" size={80} strokeWidth={1} />
+            <span className="absolute inset-0 flex items-center justify-center text-3xl font-black text-nytron-blue font-orbitron neon-text">E</span>
           </div>
-          <h1 className="text-3xl font-black tracking-tighter text-white uppercase">Ethereon</h1>
-          <p className="text-blue-500 font-bold text-xs tracking-[0.3em] uppercase mt-1">Defense OS v2.5</p>
+          <h1 className="text-4xl font-black tracking-[0.3em] text-white font-orbitron neon-text">ETHEREON</h1>
+          <p className="text-nytron-blue/60 font-bold text-xs tracking-[0.5em] uppercase mt-3">Auth Mainframe Gateway</p>
         </div>
 
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="nytron-glass p-10 rounded-2xl border-nytron-blue/20 shadow-2xl relative overflow-hidden">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Operator ID</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Access Protocol ID</label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={18} />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-nytron-blue transition-colors" size={18} />
                 <input 
                   type="text" 
-                  defaultValue="admin_operator_01"
-                  className="w-full pl-12 pr-4 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all font-mono text-sm"
-                  placeholder="Enter ID"
+                  defaultValue="ROOT_OPERATOR"
+                  className="w-full pl-12 pr-4 py-4 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-nytron-blue transition-all font-mono text-sm tracking-tight"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Security Key</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Quantum Security Key</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={18} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-nytron-blue transition-colors" size={18} />
                 <input 
                   type="password" 
                   defaultValue="••••••••"
-                  className="w-full pl-12 pr-4 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all font-mono text-sm"
-                  placeholder="Enter Key"
+                  className="w-full pl-12 pr-4 py-4 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-nytron-blue transition-all font-mono text-sm tracking-tight"
                   required
                 />
               </div>
@@ -65,30 +64,30 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50"
+              className="w-full py-5 bg-nytron-blue/10 border border-nytron-blue/40 text-nytron-blue rounded-xl font-black font-orbitron text-xs tracking-[0.3em] uppercase flex items-center justify-center gap-3 transition-all shadow-[0_0_20px_rgba(0,242,255,0.1)] hover:bg-nytron-blue hover:text-nytron-bg active:scale-95 disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-nytron-blue/20 border-t-nytron-blue rounded-full animate-spin"></div>
               ) : (
                 <>
-                  Establish Secure Link
+                  Engage Core
                   <ArrowRight size={18} />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-emerald-500">
-              <ShieldCheck size={14} />
-              <span className="text-[10px] font-bold uppercase">Quantum Encrypted</span>
+          <div className="mt-12 pt-6 border-t border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-nytron-blue/60">
+              <ShieldCheck size={16} className="animate-pulse" />
+              <span className="text-[9px] font-bold uppercase tracking-widest">Secure Link Active</span>
             </div>
-            <a href="#" className="text-[10px] font-bold text-slate-500 hover:text-blue-500 transition-colors uppercase">Forgot Access Key?</a>
+            <a href="#" className="text-[9px] font-bold text-slate-600 hover:text-nytron-blue transition-colors uppercase tracking-widest">Protocol Reset</a>
           </div>
         </div>
 
-        <p className="mt-8 text-center text-[10px] text-slate-600 font-medium uppercase tracking-[0.2em]">
-          Authorized Personnel Only • Ethereon Systems 2025
+        <p className="mt-12 text-center text-[9px] text-slate-700 font-bold uppercase tracking-[0.4em] opacity-50">
+          TIER-5 ENCRYPTION MANDATORY • AUTHORIZED PERSONNEL ONLY
         </p>
       </div>
     </div>

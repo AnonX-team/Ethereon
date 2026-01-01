@@ -4,7 +4,12 @@ import { MOCK_THREATS } from '../constants';
 import { ShieldAlert, AlertTriangle, Zap, Clock, MapPin, BrainCircuit, Send, Terminal } from 'lucide-react';
 import { createInvestigatorChat } from '../services/geminiService';
 
-const ThreatDetection: React.FC = () => {
+// Fix: Defined props to match App.tsx usage
+interface ThreatDetectionProps {
+  knowledgeBase: string[];
+}
+
+const ThreatDetection: React.FC<ThreatDetectionProps> = ({ knowledgeBase }) => {
   const [selectedThreat, setSelectedThreat] = useState<any>(MOCK_THREATS[0]);
   const [messages, setMessages] = useState<{ role: 'ai' | 'user', text: string }[]>([]);
   const [input, setInput] = useState("");
@@ -22,7 +27,8 @@ const ThreatDetection: React.FC = () => {
   const startInvestigation = async () => {
     setIsAnalyzing(true);
     const context = `Threat ID ${selectedThreat.id}: ${selectedThreat.type} on ${selectedThreat.endpoint}`;
-    chatRef.current = createInvestigatorChat(context);
+    // Fix: Pass knowledgeBase to provide the AI with custom organizational context
+    chatRef.current = createInvestigatorChat(context, knowledgeBase);
     
     try {
       const response = await chatRef.current.sendMessage({ message: "Initial assessment and first steps?" });

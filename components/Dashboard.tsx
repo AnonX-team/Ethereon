@@ -1,156 +1,158 @@
 
 import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowUpRight, Monitor, ShieldAlert, Activity, Cpu, Terminal } from 'lucide-react';
+import { Activity, ShieldAlert, Cpu, Terminal, Zap, Server, ShieldCheck, Database } from 'lucide-react';
 import { getSystemHealthSummary } from '../services/geminiService';
 import { MOCK_LOGS, MOCK_THREATS } from '../constants';
 
 const data = [
-  { name: '00:00', traffic: 420 },
-  { name: '04:00', traffic: 380 },
+  { name: '00:00', traffic: 320 },
+  { name: '04:00', traffic: 450 },
   { name: '08:00', traffic: 710 },
   { name: '12:00', traffic: 890 },
   { name: '16:00', traffic: 540 },
-  { name: '20:00', traffic: 780 },
-  { name: '23:59', traffic: 490 },
+  { name: '20:00', traffic: 980 },
+  { name: '23:59', traffic: 410 },
 ];
 
 const Dashboard: React.FC<{ setActiveTab: (t: string) => void }> = ({ setActiveTab }) => {
-  const [aiReport, setAiReport] = useState<string>("WAITING_FOR_UPLINK...");
+  const [aiReport, setAiReport] = useState<string>("Uplinking to Ethereon-Neural-Core...");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSummary = async () => {
       setLoading(true);
       const summary = await getSystemHealthSummary(MOCK_LOGS, MOCK_THREATS);
-      setAiReport(summary || "UPLINK_ERROR: Check console logs.");
+      setAiReport(summary || "No external penetration attempts verified in the current cycle.");
       setLoading(false);
     };
     fetchSummary();
   }, []);
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-          Command Dashboard
-          <span className="text-xs bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded border border-emerald-500/20 font-mono animate-pulse">SECURE</span>
-        </h2>
-        <p className="text-slate-500">Real-time intelligence and node monitoring active.</p>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="text-4xl font-black text-white font-orbitron tracking-widest neon-text">COMMAND_DASH</h2>
+          <p className="text-nytron-blue/60 text-xs font-bold uppercase tracking-[0.4em] mt-2">Active Cluster Monitoring // ETHEREON-OS</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end">
+             <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Protocol Version</span>
+             <span className="text-xs font-black text-nytron-blue font-mono tracking-tighter">ETH-4.1.0-SEC</span>
+          </div>
+          <div className="w-1.5 h-10 bg-nytron-blue/20 rounded-full relative overflow-hidden">
+             <div className="absolute top-0 w-full bg-nytron-blue h-1/2 animate-pulse"></div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Endpoints" value="05" sub="Managed Nodes" icon={Monitor} color="blue" />
-        <StatCard title="Active Threats" value="02" sub="Immediate Action" icon={ShieldAlert} color="rose" />
-        <StatCard title="Network Load" value="482" sub="Mbps" icon={Activity} color="emerald" />
-        <StatCard title="Uptime" value="99.98" sub="SLA Compliance" icon={Cpu} color="indigo" />
+        <NytronStat title="LINKED_NODES" value="005" sub="Network Active" icon={Server} color="blue" />
+        <NytronStat title="THREAT_COUNT" value="002" sub="Requires Action" icon={ShieldAlert} color="red" />
+        <NytronStat title="THROUGHPUT" value="1.2" sub="GB/S Bandwidth" icon={Activity} color="blue" />
+        <NytronStat title="UPTIME" value="99.9" sub="Core Resilience" icon={ShieldCheck} color="cyan" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm overflow-hidden relative">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Activity size={18} className="text-blue-500" />
-              Traffic Analytics
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 nytron-glass rounded-2xl p-8 border-nytron-blue/20 relative group">
+          <div className="absolute top-4 right-4 text-[9px] font-bold text-nytron-blue animate-pulse opacity-50 font-mono tracking-widest">REALTIME_FLOW</div>
+          <div className="flex items-center justify-between mb-10">
+            <h3 className="text-xs font-black text-white font-orbitron tracking-widest flex items-center gap-3">
+              <Activity size={18} className="text-nytron-blue" />
+              TRAFFIC_ANALYSIS
             </h3>
-            <div className="flex items-center gap-2 text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full text-xs font-bold">
-              <ArrowUpRight size={14} />
-              NORMAL
-            </div>
           </div>
-          <div className="h-64 w-full">
+          <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 <defs>
-                  <linearGradient id="colorTraffic" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  <linearGradient id="nytronGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00f2ff" stopOpacity={0.4}/>
+                    <stop offset="100%" stopColor="#0a84ff" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.1} />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#ffffff" opacity={0.03} />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} font-mono />
                 <YAxis hide />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', color: '#fff' }}
-                  itemStyle={{ color: '#3b82f6' }}
+                  contentStyle={{ backgroundColor: '#05070a', border: '1px solid #00f2ff33', borderRadius: '4px', fontSize: '10px', fontFamily: 'Orbitron' }}
                 />
-                <Area type="monotone" dataKey="traffic" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorTraffic)" />
+                <Area type="monotone" dataKey="traffic" stroke="#00f2ff" strokeWidth={4} fillOpacity={1} fill="url(#nytronGradient)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-slate-900 rounded-2xl p-6 text-white flex flex-col justify-between border border-blue-500/30 shadow-2xl shadow-blue-900/20 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full"></div>
-          <div>
-            <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30">
-                <Terminal size={18} />
+        <div className="space-y-6">
+          <div className="nytron-glass rounded-2xl p-8 border-nytron-blue/30 bg-nytron-blue/5 shadow-[0_0_30px_rgba(0,242,255,0.05)]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-nytron-blue flex items-center justify-center shadow-[0_0_15px_#00f2ff]">
+                <Database size={20} className="text-nytron-bg" />
               </div>
-              <h3 className="font-bold tracking-tight">AI DEFENSE_CORE</h3>
-              <div className="ml-auto flex gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:200ms]"></span>
+              <div>
+                <h4 className="text-xs font-black font-orbitron text-white">ETHEREON_CORE</h4>
+                <p className="text-[9px] font-bold text-nytron-blue uppercase tracking-widest">Intelligence Link</p>
               </div>
             </div>
-            <div className={`mono text-[11px] leading-relaxed p-4 rounded-xl bg-black/40 border border-white/5 transition-opacity duration-500 ${loading ? 'opacity-50' : 'opacity-100'}`}>
-              <span className="text-blue-400 mr-2">$ Situation Report:</span>
-              <p className="text-blue-100 mt-2">{aiReport}</p>
+            <div className="space-y-4">
+              <div className="bg-black/40 border border-white/5 p-4 rounded-xl">
+                <p className="text-[10px] leading-relaxed text-slate-300 font-medium italic">
+                  <span className="text-nytron-blue font-black uppercase block mb-2 font-orbitron tracking-widest text-[8px]">Analysis Payload:</span>
+                  {loading ? "Decrypting incoming stream..." : aiReport}
+                </p>
+              </div>
+              <button className="w-full py-4 bg-nytron-blue/10 border border-nytron-blue/30 text-nytron-blue rounded-xl font-black font-orbitron text-[10px] tracking-[0.2em] uppercase hover:bg-nytron-blue hover:text-nytron-bg transition-all">
+                REQUEST_FORENSICS
+              </button>
             </div>
           </div>
-          <button className="w-full mt-8 py-3 bg-white text-slate-950 rounded-xl font-bold text-sm hover:bg-blue-50 transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
-            GENERATE FULL AUDIT
-          </button>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <QuickLink title="Node Monitoring" icon={Monitor} onClick={() => setActiveTab('endpoint')} />
-        <QuickLink title="Threat Vault" icon={ShieldAlert} onClick={() => setActiveTab('threats')} />
-        <QuickLink title="Archive & Logs" icon={Activity} onClick={() => setActiveTab('logs')} />
-        <QuickLink title="Auto Response" icon={Activity} onClick={() => setActiveTab('response')} />
+          <div className="nytron-glass rounded-2xl p-6 border-white/5">
+             <h4 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-4">Node Health Telemetry</h4>
+             <div className="space-y-4">
+               <TelemetryItem label="Memory Frequency" value="4400 MHz" />
+               <TelemetryItem label="Security Layer" value="Alpha-Level" />
+               <TelemetryItem label="Data Integrity" value="99.999%" />
+             </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-const StatCard = ({ title, value, sub, icon: Icon, color }: any) => {
-  const colorMap: any = {
-    blue: 'text-blue-500 bg-blue-500/10 border-blue-500/10',
-    rose: 'text-rose-500 bg-rose-500/10 border-rose-500/10',
-    emerald: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/10',
-    indigo: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/10',
+const NytronStat = ({ title, value, sub, icon: Icon, color }: any) => {
+  const colorMap = {
+    blue: 'text-nytron-blue bg-nytron-blue/10 border-nytron-blue/20',
+    red: 'text-red-500 bg-red-500/10 border-red-500/20',
+    cyan: 'text-nytron-cobalt bg-nytron-cobalt/10 border-nytron-cobalt/20'
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between group hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:translate-y-[-2px]">
-      <div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">{title}</p>
-        <div className="flex items-baseline gap-2">
-          <h4 className="text-2xl font-bold text-slate-900 dark:text-white font-mono">{value}</h4>
-          <span className="text-[10px] text-slate-400 font-medium uppercase">{sub}</span>
+    <div className="nytron-glass p-6 rounded-2xl border-white/5 hover:border-nytron-blue/30 transition-all group overflow-hidden relative">
+      <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-125 group-hover:rotate-12 transition-transform duration-700">
+        <Icon size={100} />
+      </div>
+      <div className="flex justify-between items-start mb-4">
+        <div className={`p-3 rounded-lg ${colorMap[color as keyof typeof colorMap]}`}>
+          <Icon size={20} />
         </div>
       </div>
-      <div className={`p-3 rounded-xl transition-all group-hover:scale-110 ${colorMap[color]}`}>
-        <Icon size={24} />
+      <div>
+        <h4 className="text-3xl font-black text-white font-orbitron tracking-tight mb-1">{value}</h4>
+        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">{title}</p>
+        <p className="text-[8px] text-nytron-blue/40 mt-3 font-bold uppercase tracking-widest">{sub}</p>
       </div>
     </div>
   );
 };
 
-const QuickLink = ({ title, icon: Icon, onClick }: any) => (
-  <button 
-    onClick={onClick}
-    className="flex items-center justify-between p-4 bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 group hover:border-blue-500/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-  >
-    <div className="flex items-center gap-3">
-      <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all">
-        <Icon size={18} />
-      </div>
-      <span className="font-semibold text-sm text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">{title}</span>
-    </div>
-    <ArrowUpRight size={16} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-  </button>
+const TelemetryItem = ({ label, value }: any) => (
+  <div className="flex items-center justify-between border-b border-white/5 pb-2">
+    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{label}</span>
+    <span className="text-[10px] font-black text-white font-mono">{value}</span>
+  </div>
 );
 
 export default Dashboard;

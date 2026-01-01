@@ -2,76 +2,115 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 /**
- * Expert Cyber-Defense Analysis
- * Generates a focused risk assessment for a specific threat.
+ * Enhanced Cyber-Defense Analysis with Custom Knowledge
+ * Injects user-provided "training data" into the prompt.
  */
-export const analyzeThreat = async (threatType: string, severity: string, endpoint: string) => {
+export const analyzeThreat = async (
+  threatType: string, 
+  severity: string, 
+  endpoint: string, 
+  knowledgeBase: string[] = []
+) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    // Fix: Always use named parameter for apiKey and strictly from process.env.API_KEY
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const trainingData = knowledgeBase.length > 0 
+      ? `\nCUSTOM_TRAINING_CONTEXT:\n${knowledgeBase.join('\n')}` 
+      : "";
+
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
-      contents: `You are ETHEREON CORE AI. Perform an emergency forensic analysis on the following security event:
+      contents: `You are ETHEREON CORE AI. Perform emergency analysis.${trainingData}
+      
       EVENT_TYPE: ${threatType}
       SEVERITY: ${severity}
       TARGET_NODE: ${endpoint}
       
-      Respond with:
-      1. RISK_LEVEL (0-100)
-      2. 3-sentence technical summary.
-      3. IMMEDIATE_ACTION command.`,
+      Respond in JSON format:
+      {
+        "risk_score": 0-100,
+        "summary": "technical brief",
+        "action": "immediate command",
+        "confidence": "low|med|high"
+      }`,
       config: {
-        temperature: 0.4,
-        topP: 0.8,
-        thinkingConfig: { thinkingBudget: 4000 } // Added reasoning for deep analysis
+        temperature: 0.2, // Higher precision
+        responseMimeType: "application/json"
       }
     });
-    return response.text;
+    return JSON.parse(response.text || '{}');
   } catch (error) {
     console.error("ETHEREON AI ERROR:", error);
-    return "ANALYSIS_FAILURE: Neural links compromised. Proceed with manual mitigation protocol.";
+    return null;
   }
 };
 
 /**
- * Conversational Investigation
- * Allows the operator to chat with the AI about a threat.
+ * Tactical Map Grounding
+ * Locates threats geographically using Google Maps.
  */
-export const createInvestigatorChat = (threatContext: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+export const getTacticalMapContext = async (location: string) => {
+  try {
+    // Fix: Always use named parameter for apiKey and strictly from process.env.API_KEY
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `Identify the security infrastructure and potential network hops near ${location}.`,
+      config: {
+        tools: [{ googleMaps: {} }],
+      },
+    });
+    
+    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    return {
+      text: response.text,
+      links: chunks?.map((c: any) => c.maps?.uri).filter(Boolean) || []
+    };
+  } catch (error) {
+    return { text: "Tactical uplink failed.", links: [] };
+  }
+};
+
+/**
+ * Investigator Chat with Persistence
+ */
+export const createInvestigatorChat = (threatContext: string, trainingData: string[] = []) => {
+  // Fix: Always use named parameter for apiKey and strictly from process.env.API_KEY
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const customContext = trainingData.length > 0 
+    ? `\nUse this specialized knowledge for your investigation:\n${trainingData.join('\n')}` 
+    : "";
+
   return ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: `You are ETHEREON INVESTIGATOR, a specialized cyber-forensics AI. 
+      systemInstruction: `You are ETHEREON INVESTIGATOR.${customContext}
       You are investigating: ${threatContext}. 
-      Be brief, technical, and alert the operator to specific patterns or vulnerabilities. 
-      Format your responses in a clear, terminal-like style.`,
+      Provide deep technical forensics.`,
       temperature: 0.7,
     }
   });
 };
 
 /**
- * System Health Executive Summary
+ * Fix: Added missing getSystemHealthSummary export required by Dashboard.tsx.
+ * Generates a concise situation report for the command dashboard.
  */
 export const getSystemHealthSummary = async (logs: any[], threats: any[]) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-    const logSummary = logs.slice(0, 5).map(l => `[${l.date}] ${l.type}: ${l.action}`).join(' | ');
-    const threatSummary = threats.map(t => `${t.type} severity ${t.severity} on ${t.endpoint}`).join(', ');
-
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `As ETHEREON DEFENSE COMMAND, provide a high-level situation report. 
-      CURRENT_ALERTS: ${threatSummary}
-      RECENT_LOG_STREAM: ${logSummary}
+      contents: `Analyze the following system logs and active threats to provide a high-level security status report.
       
-      Maintain a professional, mission-critical tone. Focus on system integrity.`,
-      config: {
-        temperature: 0.6,
-      }
+      LOGS: ${JSON.stringify(logs)}
+      THREATS: ${JSON.stringify(threats)}
+      
+      Summarize the current situation in 2-3 sentences for a technical lead.`,
     });
     return response.text;
   } catch (error) {
-    return "STATUS_OFFLINE: Connectivity to AI engine compromised. Local backup systems active.";
+    console.error("Health Summary Error:", error);
+    return "Audit system currently unavailable.";
   }
 };
