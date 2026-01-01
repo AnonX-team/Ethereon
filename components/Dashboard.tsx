@@ -1,11 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, ShieldAlert, Cpu, Terminal, Zap, Server, ShieldCheck, Database } from 'lucide-react';
+import { Activity, ShieldAlert, Cpu, Terminal, Zap, Server, ShieldCheck, Database, Radio, Clock, ShieldX, LogIn } from 'lucide-react';
 import { getSystemHealthSummary } from '../services/geminiService';
 import { MOCK_LOGS, MOCK_THREATS } from '../constants';
 
-const data = [
+const chartData = [
   { name: '00:00', traffic: 320 },
   { name: '04:00', traffic: 450 },
   { name: '08:00', traffic: 710 },
@@ -15,9 +15,25 @@ const data = [
   { name: '23:59', traffic: 410 },
 ];
 
+interface TacticalEvent {
+  id: string;
+  timestamp: string;
+  type: string;
+  status: 'critical' | 'info' | 'warning';
+  icon: any;
+}
+
+const INITIAL_EVENTS: TacticalEvent[] = [
+  { id: 'EV-901', timestamp: '14:30:05', type: 'SSH_LOGIN_ATTEMPT', status: 'info', icon: LogIn },
+  { id: 'EV-902', timestamp: '14:30:12', type: 'FIREWALL_BLOCK_IP', status: 'warning', icon: ShieldX },
+  { id: 'EV-903', timestamp: '14:30:45', type: 'CORE_INTEGRITY_CHECK', status: 'info', icon: ShieldCheck },
+  { id: 'EV-904', timestamp: '14:31:02', type: 'UNAUTHORIZED_PORT_SCAN', status: 'critical', icon: ShieldAlert },
+];
+
 const Dashboard: React.FC<{ setActiveTab: (t: string) => void }> = ({ setActiveTab }) => {
   const [aiReport, setAiReport] = useState<string>("Uplinking to Ethereon-Neural-Core...");
   const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<TacticalEvent[]>(INITIAL_EVENTS);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -27,10 +43,24 @@ const Dashboard: React.FC<{ setActiveTab: (t: string) => void }> = ({ setActiveT
       setLoading(false);
     };
     fetchSummary();
+
+    // Simulate real-time event feed
+    const eventInterval = setInterval(() => {
+      const newEvent: TacticalEvent = {
+        id: `EV-${Math.floor(Math.random() * 900) + 100}`,
+        timestamp: new Date().toLocaleTimeString('en-GB', { hour12: false }),
+        type: ['PACKET_FILTER_PASS', 'NODE_SYNC_COMPLETE', 'ENCRYPTED_STREAM_INIT', 'DNS_QUERY_RESOLVED', 'LATENCY_SPIKE_DETECTED'][Math.floor(Math.random() * 5)],
+        status: Math.random() > 0.8 ? 'warning' : 'info',
+        icon: [Radio, Server, Database, Activity][Math.floor(Math.random() * 4)]
+      };
+      setEvents(prev => [newEvent, ...prev.slice(0, 5)]);
+    }, 5000);
+
+    return () => clearInterval(eventInterval);
   }, []);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-8 animate-in fade-in duration-700 pb-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h2 className="text-4xl font-black text-white font-orbitron tracking-widest neon-text">COMMAND_DASH</h2>
@@ -55,32 +85,85 @@ const Dashboard: React.FC<{ setActiveTab: (t: string) => void }> = ({ setActiveT
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 nytron-glass rounded-2xl p-8 border-nytron-blue/20 relative group">
-          <div className="absolute top-4 right-4 text-[9px] font-bold text-nytron-blue animate-pulse opacity-50 font-mono tracking-widest">REALTIME_FLOW</div>
-          <div className="flex items-center justify-between mb-10">
-            <h3 className="text-xs font-black text-white font-orbitron tracking-widest flex items-center gap-3">
-              <Activity size={18} className="text-nytron-blue" />
-              TRAFFIC_ANALYSIS
-            </h3>
+        <div className="lg:col-span-2 space-y-8">
+          {/* Main Chart Section */}
+          <div className="nytron-glass rounded-2xl p-8 border-nytron-blue/20 relative group">
+            <div className="absolute top-4 right-4 text-[9px] font-bold text-nytron-blue animate-pulse opacity-50 font-mono tracking-widest">REALTIME_FLOW</div>
+            <div className="flex items-center justify-between mb-10">
+              <h3 className="text-xs font-black text-white font-orbitron tracking-widest flex items-center gap-3">
+                <Activity size={18} className="text-nytron-blue" />
+                TRAFFIC_ANALYSIS
+              </h3>
+            </div>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="nytronGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00f2ff" stopOpacity={0.4}/>
+                      <stop offset="100%" stopColor="#0a84ff" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#ffffff" opacity={0.03} />
+                  <XAxis dataKey="name" stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} font-mono />
+                  <YAxis hide />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#05070a', border: '1px solid #00f2ff33', borderRadius: '4px', fontSize: '10px', fontFamily: 'Orbitron' }}
+                  />
+                  <Area type="monotone" dataKey="traffic" stroke="#00f2ff" strokeWidth={4} fillOpacity={1} fill="url(#nytronGradient)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
-                <defs>
-                  <linearGradient id="nytronGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00f2ff" stopOpacity={0.4}/>
-                    <stop offset="100%" stopColor="#0a84ff" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#ffffff" opacity={0.03} />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} font-mono />
-                <YAxis hide />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#05070a', border: '1px solid #00f2ff33', borderRadius: '4px', fontSize: '10px', fontFamily: 'Orbitron' }}
-                />
-                <Area type="monotone" dataKey="traffic" stroke="#00f2ff" strokeWidth={4} fillOpacity={1} fill="url(#nytronGradient)" />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          {/* Real-time Event Feed Section */}
+          <div className="nytron-glass rounded-2xl border-white/5 overflow-hidden">
+            <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Radio className="text-nytron-blue animate-pulse" size={18} />
+                <h3 className="text-xs font-black font-orbitron text-white tracking-widest uppercase">Tactical_Event_Feed</h3>
+              </div>
+              <span className="text-[9px] font-bold text-slate-500 font-mono">CHANNEL_SEC_01</span>
+            </div>
+            <div className="divide-y divide-white/5">
+              {events.map((event) => {
+                const Icon = event.icon;
+                return (
+                  <div key={event.id} className="p-4 hover:bg-white/5 transition-all flex items-center justify-between group">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded bg-black/40 border ${
+                        event.status === 'critical' ? 'border-red-500/50 text-red-500' : 
+                        event.status === 'warning' ? 'border-amber-500/50 text-amber-500' : 
+                        'border-nytron-blue/30 text-nytron-blue'
+                      }`}>
+                        <Icon size={14} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-white font-mono tracking-tight group-hover:text-nytron-blue transition-colors">
+                          {event.type}
+                        </span>
+                        <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                          UID: {event.id}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Clock size={10} />
+                          <span className="text-[9px] font-mono">{event.timestamp}</span>
+                        </div>
+                      </div>
+                      <div className={`w-1 h-6 rounded-full ${
+                        event.status === 'critical' ? 'bg-red-500 shadow-[0_0_8px_#ef4444]' : 
+                        event.status === 'warning' ? 'bg-amber-500 shadow-[0_0_8px_#f59e0b]' : 
+                        'bg-nytron-blue shadow-[0_0_8px_#00f2ff]'
+                      }`}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 

@@ -10,6 +10,7 @@ import LogsReports from './components/LogsReports';
 import Login from './components/Login';
 import KnowledgeBase from './components/KnowledgeBase';
 import AdminPortal from './components/AdminPortal';
+import Chatbot from './components/Chatbot';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,6 +54,9 @@ const App: React.FC = () => {
             {renderContent()}
           </div>
         </div>
+
+        {/* Floating AI Assistant */}
+        <Chatbot knowledgeBase={knowledgeBase} />
       </main>
     </div>
   );

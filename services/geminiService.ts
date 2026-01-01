@@ -12,7 +12,6 @@ export const analyzeThreat = async (
   knowledgeBase: string[] = []
 ) => {
   try {
-    // Fix: Always use named parameter for apiKey and strictly from process.env.API_KEY
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const trainingData = knowledgeBase.length > 0 
       ? `\nCUSTOM_TRAINING_CONTEXT:\n${knowledgeBase.join('\n')}` 
@@ -34,7 +33,7 @@ export const analyzeThreat = async (
         "confidence": "low|med|high"
       }`,
       config: {
-        temperature: 0.2, // Higher precision
+        temperature: 0.2,
         responseMimeType: "application/json"
       }
     });
@@ -47,11 +46,9 @@ export const analyzeThreat = async (
 
 /**
  * Tactical Map Grounding
- * Locates threats geographically using Google Maps.
  */
 export const getTacticalMapContext = async (location: string) => {
   try {
-    // Fix: Always use named parameter for apiKey and strictly from process.env.API_KEY
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -75,7 +72,6 @@ export const getTacticalMapContext = async (location: string) => {
  * Investigator Chat with Persistence
  */
 export const createInvestigatorChat = (threatContext: string, trainingData: string[] = []) => {
-  // Fix: Always use named parameter for apiKey and strictly from process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const customContext = trainingData.length > 0 
     ? `\nUse this specialized knowledge for your investigation:\n${trainingData.join('\n')}` 
@@ -93,7 +89,26 @@ export const createInvestigatorChat = (threatContext: string, trainingData: stri
 };
 
 /**
- * Fix: Added missing getSystemHealthSummary export required by Dashboard.tsx.
+ * General AI Command Chat
+ */
+export const createGeneralChat = (knowledgeBase: string[] = []) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const customContext = knowledgeBase.length > 0 
+    ? `\nORGANIZATIONAL_CONTEXT:\n${knowledgeBase.join('\n')}` 
+    : "";
+
+  return ai.chats.create({
+    model: 'gemini-3-pro-preview',
+    config: {
+      systemInstruction: `You are ETHEREON COMMAND AI, the primary interface for the Cyber-Defense Control Center.${customContext}
+      Assist the operator with system queries, security best practices, and tactical advice. 
+      Maintain a professional, high-tech, and efficient persona.`,
+      temperature: 0.8,
+    }
+  });
+};
+
+/**
  * Generates a concise situation report for the command dashboard.
  */
 export const getSystemHealthSummary = async (logs: any[], threats: any[]) => {
